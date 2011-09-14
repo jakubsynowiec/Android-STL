@@ -13,9 +13,7 @@ import android.widget.TextView;
 
 public class TaskListItemAdapter extends ArrayAdapter {
     private final Activity context;
-    private Object[] tasks;
-
-    private static final int[] TASK_PRIORITY_COLOR = {Color.GRAY, Color.GREEN, Color.BLUE, Color.RED};
+    private final Object[] tasks;
 
     public TaskListItemAdapter(Activity context, Object[] tasks)
     {

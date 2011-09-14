@@ -21,7 +21,7 @@ public class Task {
     }
 
     public void setCompleted(int completed) {
-        this.completed = (completed == 0) ? false : true;
+        this.completed = (completed != 0);
     }
 
     public int get_id() {

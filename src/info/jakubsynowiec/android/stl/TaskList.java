@@ -1,7 +1,6 @@
 package info.jakubsynowiec.android.stl;
 
 import android.app.Activity;
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -55,7 +54,6 @@ public class TaskList extends Activity
 
     private void addNewTask(String taskDescription)
     {
-        ContentValues contentValues = new ContentValues();
         database.execSQL("INSERT INTO task ('label', 'datetime', 'completed') VALUES ('" + taskDescription + "', datetime(), 0);");
     }
 

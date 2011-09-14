@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Simple Task List</string>
+    <string name="task_text_hint_new_task">Type here your new task...</string>
+    <string name="btn_save">Save task</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="btn_add">New task</string>
+    <string name="btn_clear">Clear done tasks</string>
+    <string name="error_empty">Task description cannot be empty.</string>
+</resources>

@@ -13,6 +13,25 @@ public class Task {
     private int _id;
     private String label;
     private Date datetime;
+    private int priority;
+    private String note;
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
+    }
+
+    public int getPriority() {
+        return priority;
+    }
+
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
+
     private boolean completed;
 
     public boolean isCompleted() {

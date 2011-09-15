@@ -41,6 +41,8 @@ public class TaskList extends Activity
                     t.setLabel(taskQuery.getString(TaskOpenHelper.DB_TASK_TABLE_KEY_LABEL_COLUMN));
                     t.setDatetime(taskQuery.getString(TaskOpenHelper.DB_TASK_TABLE_KEY_DATE_COLUMN));
                     t.setCompleted(taskQuery.getInt(TaskOpenHelper.DB_TASK_TABLE_KEY_COMPLETED_COLUMN));
+                    t.setPriority(taskQuery.getInt(TaskOpenHelper.DB_TASK_TABLE_KEY_PRIORITY_COLUMN));
+                    t.setNote(taskQuery.getString(TaskOpenHelper.DB_TASK_TABLE_KEY_NOTES_COLUMN));
                     // add task to list
                     tasks.add(t);
                 } catch (Exception e) {

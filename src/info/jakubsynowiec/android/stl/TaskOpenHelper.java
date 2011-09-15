@@ -21,6 +21,10 @@ public class TaskOpenHelper extends SQLiteOpenHelper {
     public static final int DB_TASK_TABLE_KEY_DATE_COLUMN = 2;
     private static final String DB_TASK_TABLE_KEY_COMPLETED = "completed";
     public static final int DB_TASK_TABLE_KEY_COMPLETED_COLUMN = 3;
+    private static final String DB_TASK_TABLE_KEY_PRIORITY = "priority";
+    public static final int DB_TASK_TABLE_KEY_PRIORITY_COLUMN = 4;
+    private static final String DB_TASK_TABLE_KEY_NOTES = "notes";
+    public static final int DB_TASK_TABLE_KEY_NOTES_COLUMN = 5;
 
     Context context;
     SQLiteDatabase database;
@@ -49,14 +53,17 @@ public class TaskOpenHelper extends SQLiteOpenHelper {
         ContentValues taskValues = new ContentValues();
         taskValues.put(DB_TASK_TABLE_KEY_LABEL, t.getLabel());
         taskValues.put(DB_TASK_TABLE_KEY_COMPLETED, completed);
+        taskValues.put(DB_TASK_TABLE_KEY_NOTES, t.getNote());
+        taskValues.put(DB_TASK_TABLE_KEY_PRIORITY, t.getPriority());
         return database.update(DB_TASK_TABLE, taskValues, where, null) > 0;
     }
 
     public Cursor getAllTasks()
     {
-        String[] columns = {DB_TASK_TABLE_KEY_ID, DB_TASK_TABLE_KEY_LABEL, DB_TASK_TABLE_KEY_DATE, DB_TASK_TABLE_KEY_COMPLETED};
+        String[] columns = {DB_TASK_TABLE_KEY_ID, DB_TASK_TABLE_KEY_LABEL, DB_TASK_TABLE_KEY_DATE, DB_TASK_TABLE_KEY_COMPLETED, DB_TASK_TABLE_KEY_NOTES, DB_TASK_TABLE_KEY_PRIORITY};
         String where = DB_TASK_TABLE_KEY_COMPLETED + "=0";
-        return database.query(DB_TASK_TABLE, columns, where, null, null, null, null);
+        String order = DB_TASK_TABLE_KEY_DATE + " ASC, " + DB_TASK_TABLE_KEY_PRIORITY + " DESC";
+        return database.query(DB_TASK_TABLE, columns, where, null, null, null, order, null);
     }
 
     @Override
@@ -65,7 +72,9 @@ public class TaskOpenHelper extends SQLiteOpenHelper {
                    + "_id INTEGER PRIMARY KEY AUTOINCREMENT,"
                    + "label TEXT,"
                    + "datetime TEXT DEFAULT (DATETIME('NOW')),"
-                   + "completed INTEGER DEFAULT 0"
+                   + "completed INTEGER DEFAULT 0,"
+                   + "priority INTEGER DEFAULT 2,"
+                   + "notes INTEGER DEFAULT NULL"
                    + ");");
     }
 

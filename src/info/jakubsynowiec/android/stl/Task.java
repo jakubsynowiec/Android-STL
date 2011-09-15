@@ -2,7 +2,6 @@ package info.jakubsynowiec.android.stl;
 
 import android.util.Log;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -12,7 +11,7 @@ public class Task {
     public static final String TAG = "Task";
 
     private int _id;
-    private String title;
+    private String label;
     private Date datetime;
     private boolean completed;
 
@@ -32,12 +31,12 @@ public class Task {
         this._id = _id;
     }
 
-    public String getTitle() {
-        return title;
+    public String getLabel() {
+        return label;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setLabel(String label) {
+        this.label = label;
     }
 
     public Date getDatetime() {

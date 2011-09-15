@@ -1,9 +1,10 @@
 package info.jakubsynowiec.android.stl;
 
+import java.util.ArrayList;
+
 import android.app.Activity;
-import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Color;
 import android.graphics.Paint;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,15 +12,20 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
-public class TaskListItemAdapter extends ArrayAdapter {
-    private final Activity context;
-    private final Object[] tasks;
+public class TaskListItemAdapter extends ArrayAdapter<Task> {
+    private static final String TAG = "TaskListItemAdapter";
 
-    public TaskListItemAdapter(Activity context, Object[] tasks)
+    private final Activity context;
+    private final ArrayList<Task> tasks;
+
+    private final TaskOpenHelper taskOpenHelper;
+
+    public TaskListItemAdapter(Activity context, ArrayList<Task> tasks, TaskOpenHelper taskOpenHelper)
     {
         super(context, R.layout.tasklistitem, tasks);
         this.context = context;
         this.tasks = tasks;
+        this.taskOpenHelper = taskOpenHelper;
     }
 
     static class ViewHolder {
@@ -46,29 +52,32 @@ public class TaskListItemAdapter extends ArrayAdapter {
 			holder = (ViewHolder) taskListItem.getTag();
 		}
 
-        task = (Task) tasks[position];
+        task = (Task) tasks.get(position);
 
-		holder.label.setText(task.getTitle());
         if (task.isCompleted()) {
             holder.label.setPaintFlags(holder.label.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
         } else {
             holder.label.setPaintFlags(holder.label.getPaintFlags() &~ Paint.STRIKE_THRU_TEXT_FLAG);
         }
 
+        holder.label.setText(task.getLabel());
+
         holder.checkBox.setChecked(task.isCompleted());
         holder.checkBox.setTag(position);
 
         holder.checkBox.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-                Task t = (Task) getItem((Integer) view.getTag());
-                TaskOpenHelper taskOpenHelper = new TaskOpenHelper(context);
-                SQLiteDatabase database = taskOpenHelper.getWritableDatabase();
-                int c = ((CheckBox) view).isChecked() ? 1 : 0;
+                try {
+                    Task t = (Task) getItem((Integer) view.getTag());
+                    int c = ((CheckBox) view).isChecked() ? 1 : 0;
 
-                t.setCompleted(c);
-                database.execSQL("UPDATE task SET completed = " + c + " WHERE _id = " + t.get_id());
+                    t.setCompleted(c);
+                    taskOpenHelper.updateTask(t);
 
-                notifyDataSetChanged();
+                    notifyDataSetChanged();
+                } catch (Exception e) {
+                    Log.e(TAG, e.getMessage());
+                }
             }
         });
 

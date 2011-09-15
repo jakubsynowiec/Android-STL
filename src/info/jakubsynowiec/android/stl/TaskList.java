@@ -3,8 +3,8 @@ package info.jakubsynowiec.android.stl;
 import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -19,9 +19,6 @@ public class TaskList extends Activity
     private Context context;
 
     private TaskOpenHelper taskOpenHelper;
-    private SQLiteDatabase database;
-
-    private Cursor taskQuery;
 
     private ListView listView;
     private ArrayList<Task> tasks;
@@ -29,32 +26,36 @@ public class TaskList extends Activity
 
     private void updateTaskList()
     {
+        // clear list
         tasks.clear();
-        taskQuery.requery();
-        if(taskQuery.moveToFirst()) {
+        Cursor taskQuery = taskOpenHelper.getAllTasks();
+        // if there are tasks in query then add them to list
+        if (taskQuery.moveToFirst()) {
             Task t;
             do {
-                t = new Task();
-                t.set_id(taskQuery.getInt(taskQuery.getColumnIndex("_id")));
-                t.setTitle(taskQuery.getString(taskQuery.getColumnIndex("label")));
-                t.setDatetime(taskQuery.getString(taskQuery.getColumnIndex("datetime")));
-                t.setCompleted(taskQuery.getInt(taskQuery.getColumnIndex("completed")));
-                tasks.add(t);
+                try {
+                    // create a new task
+                    t = new Task();
+                    // and set parameters
+                    t.set_id(taskQuery.getInt(TaskOpenHelper.DB_TASK_TABLE_KEY_ID_COLUMN));
+                    t.setLabel(taskQuery.getString(TaskOpenHelper.DB_TASK_TABLE_KEY_LABEL_COLUMN));
+                    t.setDatetime(taskQuery.getString(TaskOpenHelper.DB_TASK_TABLE_KEY_DATE_COLUMN));
+                    t.setCompleted(taskQuery.getInt(TaskOpenHelper.DB_TASK_TABLE_KEY_COMPLETED_COLUMN));
+                    // add task to list
+                    tasks.add(t);
+                } catch (Exception e) {
+                    Log.e(TAG, e.getMessage());
+                }
             } while (taskQuery.moveToNext());
         }
-
+        taskQuery.close();
         fillListData();
     }
 
     private void fillListData()
     {
-        itemAdapter = new TaskListItemAdapter(this, tasks.toArray());
+        itemAdapter = new TaskListItemAdapter(this, tasks, taskOpenHelper);
         listView.setAdapter(itemAdapter);
-    }
-
-    private void addNewTask(String taskDescription)
-    {
-        database.execSQL("INSERT INTO task ('label', 'datetime', 'completed') VALUES ('" + taskDescription + "', datetime(), 0);");
     }
 
     private void showNewTaskButtons()
@@ -114,7 +115,7 @@ public class TaskList extends Activity
                 if (taskText.length() == 0) {
                     editText.setError(context.getString(R.string.error_empty));
                 } else {
-                    addNewTask(taskText);
+                    taskOpenHelper.insertTask(taskText);
                     updateTaskList();
                     editText.setText("");
                 }
@@ -125,8 +126,7 @@ public class TaskList extends Activity
     @Override
     protected void onStart() {
         super.onStart();
-        database = taskOpenHelper.getWritableDatabase();
-        taskQuery = database.rawQuery("SELECT _id, label, datetime, completed FROM task WHERE completed = 0 ORDER BY datetime ASC;", null);
+        taskOpenHelper.openDatabase();
     }
 
     @Override
@@ -138,8 +138,6 @@ public class TaskList extends Activity
     @Override
     protected void onPause() {
         super.onPause();
-
-        taskQuery.close();
-        database.close();
+        taskOpenHelper.close();
     }
 }
